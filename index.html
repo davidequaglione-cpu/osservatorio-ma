@@ -37,11 +37,11 @@
     const LISTS = {
       fonte_primaria:       ["Registro Imprese","Stampa nazionale","Stampa locale","Segnalazione advisor","Database commerciale","Comunicato societario","Altro"],
       tipologia_operazione: ["Buy out","Expansion","Replacement","Infrastructure","Turnaround"],
-      deal_origination:     ["Family & Private","Secondary Buy Out","Public to Private","Local Parent (spin-off)","Receivership / Distressed","Other"],
+      deal_origination:     ["Family & Private","Secondary Buy Out","Public to Private","Local Parent (spin-off)","Proc. concorsuali / Distressed","Altro"],
       modalita_pagamento:   ["Cash","Stock","Misto","Earn-out","n.d."],
-      acquirente_tipo:      ["PE / Fondo","Corporate strategico","Family Office","Holding privata","Infra fund","Altro"],
+      acquirente_tipo:      ["PE / Fondo","Corporate strategico","Family Office","Holding privata","Fondo infrastrutturale","Altro"],
       target_provincia:     ["CH — Chieti","PE — Pescara","TE — Teramo","AQ — L'Aquila"],
-      settore_pem:          ["Industrial products","Consumer goods","Food & beverage","ICT / Software","Healthcare / Pharma","Financial services","Cleantech","Leisure","Professional & social services","Other"],
+      settore_pem:          ["Industrial products","Consumer goods","Food & beverage","ICT / Software","Healthcare / Pharma","Financial services","Cleantech","Leisure","Professional & social services","Altro"],
       target_dimensione:    ["< 2M (micro)","2–10M (piccola)","10–50M (media)","50–300M (grande)","> 300M (molto grande)"],
       affidabilita:         ["Alta","Media","Bassa"],
     };
@@ -66,7 +66,7 @@
       { id:"B", label:"Deal",            icon:"🤝" },
       { id:"C", label:"Acquirente",      icon:"🏢" },
       { id:"D", label:"Target",          icon:"🏭" },
-      { id:"E", label:"Financials",      icon:"📊" },
+      { id:"E", label:"Finanziari",       icon:"📊" },
       { id:"F", label:"Metadati",        icon:"📋" },
     ];
 
@@ -398,7 +398,13 @@
                 Segnalazione operazione M&amp;A — Abruzzo
               </p>
             </div>
-            <div style={{ display:"flex", gap:10 }}>
+            <div style={{ display:"flex", gap:10, alignItems:"center" }}>
+              <a href="help.html" target="_blank"
+                style={{ background:"rgba(255,255,255,0.12)", border:"1px solid rgba(255,255,255,0.3)",
+                  color:"#fff", borderRadius:6, padding:"7px 14px", cursor:"pointer", fontSize:12,
+                  textDecoration:"none" }}>
+                ? Guida alla compilazione
+              </a>
               {records.length > 0 && (
                 <button type="button" onClick={() => setShowRecords(!showRecords)}
                   style={{ background:"rgba(255,255,255,0.15)", border:"1px solid rgba(255,255,255,0.3)",

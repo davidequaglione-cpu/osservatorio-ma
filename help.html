@@ -1,0 +1,765 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Guida alla compilazione — Osservatorio M&A Abruzzo</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:wght@400;600;700&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Source Serif 4', Georgia, serif;
+      background: #F5F8FC;
+      color: #1A1A2E;
+      line-height: 1.7;
+    }
+    a { color: #2980B9; }
+
+    /* Header */
+    .header {
+      background: #1B4F8A;
+      padding: 18px 28px;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .header-title { color: #fff; font-size: 17px; font-weight: 700; }
+    .header-sub { color: #7FB3D3; font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; font-weight: 600; margin-bottom: 3px; }
+    .back-btn {
+      background: rgba(255,255,255,0.12);
+      border: 1px solid rgba(255,255,255,0.3);
+      color: #fff;
+      border-radius: 6px;
+      padding: 7px 14px;
+      font-size: 12px;
+      font-family: inherit;
+      cursor: pointer;
+      text-decoration: none;
+    }
+
+    /* Layout */
+    .container { max-width: 780px; margin: 0 auto; padding: 36px 24px 80px; }
+
+    /* Intro */
+    .intro {
+      background: #EBF5FB;
+      border: 1px solid #D0DCE8;
+      border-radius: 10px;
+      padding: 18px 22px;
+      margin-bottom: 36px;
+      font-size: 13.5px;
+      color: #1A3A5C;
+    }
+    .intro strong { color: #1B4F8A; }
+
+    /* TOC */
+    .toc {
+      background: #fff;
+      border: 1px solid #D0DCE8;
+      border-radius: 10px;
+      padding: 20px 24px;
+      margin-bottom: 36px;
+    }
+    .toc h2 { font-size: 12px; font-weight: 700; color: #1B4F8A; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 12px; }
+    .toc ol { padding-left: 20px; }
+    .toc li { margin-bottom: 5px; font-size: 13.5px; }
+    .toc a { text-decoration: none; }
+    .toc a:hover { text-decoration: underline; }
+
+    /* Section */
+    .section { margin-bottom: 48px; }
+    .section-header {
+      border-left: 4px solid #1B4F8A;
+      padding: 10px 0 10px 14px;
+      margin-bottom: 24px;
+      background: #fff;
+      border-radius: 0 8px 8px 0;
+    }
+    .section-header h2 {
+      font-size: 16px;
+      font-weight: 700;
+      color: #1B4F8A;
+      margin-bottom: 2px;
+    }
+    .section-header p {
+      font-size: 12px;
+      color: #6B7C93;
+    }
+
+    /* Field card */
+    .field {
+      background: #fff;
+      border: 1px solid #D0DCE8;
+      border-radius: 10px;
+      padding: 18px 22px;
+      margin-bottom: 14px;
+    }
+    .field-name {
+      font-size: 13px;
+      font-weight: 700;
+      color: #1A1A2E;
+      margin-bottom: 6px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .badge-req {
+      font-size: 10px;
+      font-weight: 700;
+      background: #FEF0EE;
+      color: #C0392B;
+      border-radius: 4px;
+      padding: 2px 7px;
+      letter-spacing: 0.04em;
+    }
+    .badge-opt {
+      font-size: 10px;
+      font-weight: 700;
+      background: #F5F8FC;
+      color: #6B7C93;
+      border-radius: 4px;
+      padding: 2px 7px;
+      letter-spacing: 0.04em;
+    }
+    .badge-auto {
+      font-size: 10px;
+      font-weight: 700;
+      background: #E8F8F0;
+      color: #1A7A4A;
+      border-radius: 4px;
+      padding: 2px 7px;
+      letter-spacing: 0.04em;
+    }
+    .field-desc {
+      font-size: 13.5px;
+      color: #2C3E50;
+      margin-bottom: 10px;
+    }
+    .field-options {
+      margin: 10px 0;
+      padding-left: 0;
+      list-style: none;
+    }
+    .field-options li {
+      font-size: 13px;
+      padding: 5px 0 5px 12px;
+      border-left: 2px solid #D0DCE8;
+      margin-bottom: 4px;
+      color: #2C3E50;
+    }
+    .field-options li strong { color: #1B4F8A; }
+    .field-example {
+      background: #F5F8FC;
+      border-radius: 6px;
+      padding: 8px 12px;
+      font-size: 12px;
+      color: #4A6A8A;
+      margin-top: 10px;
+    }
+    .field-example strong { color: #1B4F8A; font-weight: 700; }
+    .field-note {
+      background: #FFF9E6;
+      border: 1px solid #F9E4A0;
+      border-radius: 6px;
+      padding: 8px 12px;
+      font-size: 12px;
+      color: #6B4F00;
+      margin-top: 10px;
+    }
+
+    /* Divider */
+    hr { border: none; border-top: 1px solid #D0DCE8; margin: 32px 0; }
+  </style>
+</head>
+<body>
+
+<div class="header">
+  <div>
+    <div class="header-sub">Osservatorio M&amp;A · Università degli Studi d'Abruzzo</div>
+    <div class="header-title">Guida alla compilazione del form</div>
+  </div>
+  <a href="index.html" class="back-btn">← Torna al form</a>
+</div>
+
+<div class="container">
+
+  <div class="intro">
+    Questa guida descrive ogni campo del form di segnalazione. I campi contrassegnati con
+    <span style="background:#FEF0EE;color:#C0392B;border-radius:4px;padding:1px 6px;font-size:11px;font-weight:700;">OBBLIGATORIO</span>
+    devono essere compilati per procedere allo step successivo.
+    I campi <span style="background:#F5F8FC;color:#6B7C93;border-radius:4px;padding:1px 6px;font-size:11px;font-weight:700;">FACOLTATIVO</span>
+    vanno compilati se il dato è pubblicamente disponibile.
+    I campi <span style="background:#E8F8F0;color:#1A7A4A;border-radius:4px;padding:1px 6px;font-size:11px;font-weight:700;">AUTOMATICO</span>
+    sono calcolati dal sistema e non richiedono inserimento.
+    <br><br>
+    <strong>Principio guida:</strong> inserire solo dati ricavabili da fonti pubbliche o dalla propria
+    diretta conoscenza professionale del deal. Non stimare valori finanziari se non si ha un fondamento
+    documentale; lasciare il campo vuoto e segnalare nelle note eventuali informazioni da verificare.
+  </div>
+
+  <div class="toc">
+    <h2>Indice</h2>
+    <ol>
+      <li><a href="#step-a">A — Identificazione del deal</a></li>
+      <li><a href="#step-b">B — Caratteristiche del deal</a></li>
+      <li><a href="#step-c">C — Acquirente / investitore</a></li>
+      <li><a href="#step-d">D — Impresa target (anagrafica)</a></li>
+      <li><a href="#step-e">E — Dati economico-finanziari</a></li>
+      <li><a href="#step-f">F — Metadati e compilatore</a></li>
+    </ol>
+  </div>
+
+  <!-- ── STEP A ─────────────────────────────────────────────────────────────── -->
+  <div class="section" id="step-a">
+    <div class="section-header">
+      <h2>🗓 A — Identificazione del deal</h2>
+      <p>Dati temporali e di fonte per identificare e datare univocamente l'operazione.</p>
+    </div>
+
+    <div class="field">
+      <div class="field-name">Data annuncio <span class="badge-req">OBBLIGATORIO</span></div>
+      <div class="field-desc">
+        La data in cui l'operazione è stata comunicata pubblicamente per la prima volta,
+        anche attraverso fonti indirette (articolo di stampa, comunicato aziendale, annuncio borsistico).
+        È il campo più critico: determina l'anno di riferimento del deal e la sua collocazione
+        temporale nell'osservatorio.<br><br>
+        Se è nota solo l'anno, inserire il 1° gennaio di quell'anno (es. 01/01/2023).
+      </div>
+      <div class="field-example">
+        <strong>Esempi:</strong> 15/03/2023 (data precisa da comunicato stampa) &nbsp;|&nbsp;
+        01/01/2022 (solo anno noto dalla stampa)
+      </div>
+    </div>
+
+    <div class="field">
+      <div class="field-name">Data closing <span class="badge-opt">FACOLTATIVO</span></div>
+      <div class="field-desc">
+        La data in cui il trasferimento di proprietà è diventato giuridicamente efficace
+        (rogito notarile, closing legale, registrazione al Registro Imprese). Può essere
+        distante anche di molti mesi dalla data di annuncio. Lasciare vuoto se non
+        disponibile pubblicamente.
+      </div>
+      <div class="field-example">
+        <strong>Esempio:</strong> 30/06/2023 (closing sei mesi dopo l'annuncio di dicembre 2022)
+      </div>
+    </div>
+
+    <div class="field">
+      <div class="field-name">Fonte primaria <span class="badge-req">OBBLIGATORIO</span></div>
+      <div class="field-desc">
+        La fonte principale dalla quale l'operazione è stata appresa o verificata:
+      </div>
+      <ul class="field-options">
+        <li><strong>Registro Imprese</strong> — atto di cessione quote o di fusione, visura camerale aggiornata. È la fonte più affidabile.</li>
+        <li><strong>Stampa nazionale</strong> — Il Sole 24 Ore, MF - Milano Finanza, Reuters, Bloomberg, Il Corriere della Sera (sezione economia).</li>
+        <li><strong>Stampa locale</strong> — Il Centro, Il Messaggero Abruzzo, Pescara Today, testate locali abruzzesi.</li>
+        <li><strong>Segnalazione advisor</strong> — informazione ricevuta direttamente da uno studio legale, finanziario o da un advisor coinvolto nell'operazione.</li>
+        <li><strong>Database commerciale</strong> — Mergermarket, Zephyr (Bureau van Dijk), PitchBook, Refinitiv Eikon.</li>
+        <li><strong>Comunicato societario</strong> — press release ufficiale pubblicato dall'acquirente, dal target o dalle rispettive capogruppo.</li>
+        <li><strong>Altro</strong> — qualsiasi altra fonte; specificare nelle note al passo F.</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- ── STEP B ─────────────────────────────────────────────────────────────── -->
+  <div class="section" id="step-b">
+    <div class="section-header">
+      <h2>🤝 B — Caratteristiche del deal</h2>
+      <p>Struttura, tipologia e parametri economici dell'operazione.</p>
+    </div>
+
+    <div class="field">
+      <div class="field-name">Tipologia operazione <span class="badge-req">OBBLIGATORIO</span></div>
+      <div class="field-desc">
+        La classificazione PEM® (Private Equity Monitor) sviluppata dalla LIUC Università Cattaneo,
+        adottata come standard dall'Osservatorio. Identifica la natura strategica dell'investimento:
+      </div>
+      <ul class="field-options">
+        <li><strong>Buy out</strong> — acquisizione del controllo da parte di un fondo PE o di un management team (MBO/MBI), tipicamente con ricorso alla leva finanziaria (LBO). È la fattispecie più comune nelle operazioni PE.</li>
+        <li><strong>Expansion</strong> — investimento di minoranza o co-investimento in un'impresa già attiva, finalizzato a finanziarne la crescita organica o per linee esterne.</li>
+        <li><strong>Replacement</strong> — sostituzione di uno o più soci uscenti (es. fondatore che disinveste) senza modificare la struttura operativa o il management dell'impresa.</li>
+        <li><strong>Infrastructure</strong> — acquisizione di asset infrastrutturali: energia (rinnovabili, reti), trasporti, utilities, real estate strategico.</li>
+        <li><strong>Turnaround</strong> — investimento in un'impresa in difficoltà operativa o finanziaria, con piano di ristrutturazione industriale.</li>
+      </ul>
+      <div class="field-note">
+        ⚠ Per le acquisizioni da parte di corporate strategici (non PE), usare la tipologia che meglio descrive la natura dell'operazione: <em>Expansion</em> se è un investimento di crescita, <em>Buy out</em> se è un'acquisizione di controllo totalitaria.
+      </div>
+    </div>
+
+    <div class="field">
+      <div class="field-name">Deal origination <span class="badge-req">OBBLIGATORIO</span></div>
+      <div class="field-desc">
+        L'origine o la motivazione principale che ha reso disponibile l'azienda target sul mercato:
+      </div>
+      <ul class="field-options">
+        <li><strong>Family &amp; Private</strong> — passaggio generazionale (fondatore/famiglia che cede a terzi), liquidazione di soci di minoranza, o uscita di imprenditori privati.</li>
+        <li><strong>Secondary Buy Out</strong> — vendita da parte di un fondo PE a un altro fondo PE (il target era già in portafoglio PE).</li>
+        <li><strong>Public to Private</strong> — delisting di una società quotata in borsa, con acquisizione da parte di un soggetto privato.</li>
+        <li><strong>Local Parent (spin-off)</strong> — scorporo (carve-out) di una divisione o business unit da un gruppo più grande, ceduta a terzi.</li>
+        <li><strong>Proc. concorsuali / Distressed</strong> — vendita nell'ambito di procedure concorsuali (fallimento, concordato preventivo, amministrazione straordinaria) o di situazioni di grave difficoltà finanziaria.</li>
+        <li><strong>Altro</strong> — origination non classificabile nelle categorie precedenti.</li>
+      </ul>
+    </div>
+
+    <div class="field">
+      <div class="field-name">Quota acquisita (%) <span class="badge-opt">FACOLTATIVO</span></div>
+      <div class="field-desc">
+        La percentuale del capitale sociale del target acquisita nell'operazione. Inserire il valore
+        numerico senza il simbolo % (es. <em>60</em> per il 60%).
+        Se è nota solo una fascia approssimativa, usare il valore convenzionale corrispondente:
+        51 per "quota di controllo", 75 per "larga maggioranza", 100 per acquisizione totale.
+        Lasciare vuoto se il dato non è pubblicamente disponibile.
+      </div>
+    </div>
+
+    <div class="field">
+      <div class="field-name">Modalità di pagamento <span class="badge-opt">FACOLTATIVO</span></div>
+      <ul class="field-options">
+        <li><strong>Cash</strong> — corrispettivo interamente in denaro.</li>
+        <li><strong>Azioni</strong> — corrispettivo interamente in azioni dell'acquirente (stock swap / concambio).</li>
+        <li><strong>Misto</strong> — combinazione di cash e azioni.</li>
+        <li><strong>Earn-out</strong> — parte del prezzo è differita e condizionata al raggiungimento di obiettivi futuri del target (EBITDA, fatturato, milestone specifiche).</li>
+        <li><strong>n.d.</strong> — modalità non disponibile pubblicamente.</li>
+      </ul>
+    </div>
+
+    <div class="field">
+      <div class="field-name">Equity investito (€M) <span class="badge-opt">FACOLTATIVO</span></div>
+      <div class="field-desc">
+        Il solo ammontare di equity (fondi propri) impiegato nell'operazione, al netto del debito
+        acquisito o della leva finanziaria utilizzata. Esprimere in milioni di euro con un decimale.
+        Lasciare vuoto se è disponibile solo il dato di Enterprise Value complessivo.
+      </div>
+      <div class="field-example">
+        <strong>Esempio:</strong> in un LBO da 50M€ con 30M€ di debito bancario, l'equity investito è 20.0
+      </div>
+    </div>
+
+    <div class="field">
+      <div class="field-name">Enterprise Value (€M) <span class="badge-opt">FACOLTATIVO</span></div>
+      <div class="field-desc">
+        Il valore dell'intera azienda al momento dell'acquisizione, calcolato come:
+        <em>Equity Value + Posizione Finanziaria Netta (debiti - liquidità)</em>.
+        Rappresenta il "prezzo" di tutta l'impresa indipendentemente da come è finanziata.
+        È il dato di prezzo più citato nei comunicati e nella stampa. Esprimere in milioni di euro.
+      </div>
+      <div class="field-example">
+        <strong>Esempio:</strong> se il comunicato cita "valorizzazione dell'azienda di 45 milioni di euro", inserire 45.0
+      </div>
+    </div>
+
+    <div class="field">
+      <div class="field-name">EV/EBITDA (x) <span class="badge-opt">FACOLTATIVO</span></div>
+      <div class="field-desc">
+        Il principale multiplo di valutazione nelle operazioni M&amp;A, calcolato come rapporto tra
+        Enterprise Value ed EBITDA normalizzato (ultimo esercizio o media degli ultimi due).
+        Inserire solo se il dato è affidabile — non stimare se non si ha una base documentale.
+        Il benchmark nazionale PEM® 2025 per le operazioni PE è 11,6x.
+      </div>
+      <div class="field-example">
+        <strong>Esempio:</strong> 8.5 (EV di 42,5M€ su EBITDA di 5M€)
+      </div>
+    </div>
+
+    <div class="field">
+      <div class="field-name">EV/Sales (x) <span class="badge-opt">FACOLTATIVO</span></div>
+      <div class="field-desc">
+        Multiplo Enterprise Value su fatturato. Più utilizzato per imprese in fase di sviluppo,
+        settori ad alta crescita (tech, biotech) o aziende con EBITDA non significativo.
+        Inserire solo se disponibile.
+      </div>
+    </div>
+
+    <div class="field">
+      <div class="field-name">Operazione add-on? <span class="badge-opt">FACOLTATIVO</span></div>
+      <div class="field-desc">
+        Selezionare <em>Sì</em> se l'acquirente è una <strong>portfolio company</strong> già in portafoglio
+        di un fondo PE, che acquisisce la società target per integrarla nella propria piattaforma
+        (operazione di bolt-on o add-on). Se Sì, si attiva il campo "Platform company".
+        Selezionare <em>No</em> (impostazione predefinita) in tutti gli altri casi.
+      </div>
+    </div>
+
+    <div class="field">
+      <div class="field-name">Cross-border? <span class="badge-opt">FACOLTATIVO</span></div>
+      <div class="field-desc">
+        Selezionare <em>Sì</em> se almeno uno tra acquirente e target è estero (sede legale fuori Italia).
+        Il sistema imposta automaticamente <em>Sì</em> se il paese dell'acquirente è diverso da IT.
+        Confermare manualmente <em>Sì</em> anche nel caso inverso (acquirente italiano che acquisisce target estero).
+      </div>
+    </div>
+
+    <div class="field">
+      <div class="field-name">Platform company <span class="badge-opt">FACOLTATIVO — visibile solo se add-on = Sì</span></div>
+      <div class="field-desc">
+        La ragione sociale dell'impresa già in portafoglio del fondo PE che effettua l'acquisizione add-on.
+        Aiuta a ricostruire le catene di add-on all'interno dello stesso portafoglio.
+      </div>
+      <div class="field-example">
+        <strong>Esempio:</strong> Alfa Meccanica SpA (portfolio company del fondo XYZ che acquisisce Beta Srl come bolt-on)
+      </div>
+    </div>
+  </div>
+
+  <!-- ── STEP C ─────────────────────────────────────────────────────────────── -->
+  <div class="section" id="step-c">
+    <div class="section-header">
+      <h2>🏢 C — Acquirente / investitore</h2>
+      <p>Identità e profilo del soggetto che acquisisce o investe.</p>
+    </div>
+
+    <div class="field">
+      <div class="field-name">Ragione sociale acquirente <span class="badge-req">OBBLIGATORIO</span></div>
+      <div class="field-desc">
+        Il nome completo e ufficiale del lead investor o acquirente strategico, come compare
+        nell'atto o nel comunicato. Per i fondi PE, usare il nome del fondo (non della SGR gestrice).
+        Per i club deal, indicare il lead investor e gli altri co-investitori nel campo apposito.
+      </div>
+      <div class="field-example">
+        <strong>Esempi:</strong> Progressio Investimenti — Fondo IV &nbsp;|&nbsp; Stellantis N.V. &nbsp;|&nbsp; Delfin S.à r.l. &nbsp;|&nbsp; Fondo Italiano d'Investimento SGR
+      </div>
+    </div>
+
+    <div class="field">
+      <div class="field-name">Tipo acquirente <span class="badge-req">OBBLIGATORIO</span></div>
+      <ul class="field-options">
+        <li><strong>PE / Fondo</strong> — fondo di private equity, venture capital, growth equity o fondo di credito.</li>
+        <li><strong>Corporate strategico</strong> — impresa industriale o di servizi che acquisisce per motivi di crescita strategica (integrazione orizzontale, verticale, diversificazione).</li>
+        <li><strong>Family Office</strong> — veicolo d'investimento di una famiglia imprenditoriale o patrimoniale.</li>
+        <li><strong>Holding privata</strong> — holding non quotata e non assimilabile a un fondo istituzionale.</li>
+        <li><strong>Fondo infrastrutturale</strong> — fondo specializzato in asset infrastrutturali, real asset o energy.</li>
+        <li><strong>Altro</strong> — es. management team (MBO puro senza PE), ente pubblico, fondazione bancaria.</li>
+      </ul>
+    </div>
+
+    <div class="field">
+      <div class="field-name">Paese acquirente <span class="badge-req">OBBLIGATORIO</span></div>
+      <div class="field-desc">
+        Il codice ISO 3166-1 alpha-2 (2 lettere maiuscole) del paese in cui ha sede legale
+        l'acquirente. Se il fondo è registrato in Lussemburgo ma gestito da una SGR italiana,
+        usare il paese di registrazione del fondo (LU).
+      </div>
+      <div class="field-example">
+        <strong>Codici più frequenti:</strong> IT (Italia) · FR (Francia) · DE (Germania) ·
+        US (Stati Uniti) · GB (Regno Unito) · LU (Lussemburgo) · NL (Paesi Bassi) · CH (Svizzera)
+      </div>
+    </div>
+
+    <div class="field">
+      <div class="field-name">Co-investitori <span class="badge-opt">FACOLTATIVO</span></div>
+      <div class="field-desc">
+        Eventuali altri investitori che partecipano al round o all'acquisizione affianco al lead investor.
+        Separare con punto e virgola (;) se sono più di uno. Lasciare vuoto se l'acquirente opera in solitaria.
+      </div>
+      <div class="field-example">
+        <strong>Esempio:</strong> Fondo Italiano d'Investimento SGR; CDP Equity
+      </div>
+    </div>
+
+    <div class="field">
+      <div class="field-name">Advisor legale (acquirente) <span class="badge-opt">FACOLTATIVO</span></div>
+      <div class="field-desc">
+        Studio legale che ha assistito l'acquirente nell'operazione. Se non pubblicamente noto, lasciare vuoto.
+      </div>
+      <div class="field-example">
+        <strong>Esempi:</strong> Bonelli Erede &nbsp;|&nbsp; Chiomenti &nbsp;|&nbsp; Legance &nbsp;|&nbsp; Dla Piper &nbsp;|&nbsp; Gianni &amp; Origoni
+      </div>
+    </div>
+
+    <div class="field">
+      <div class="field-name">Advisor finanziario (acquirente) <span class="badge-opt">FACOLTATIVO</span></div>
+      <div class="field-desc">
+        Investment bank, boutique M&amp;A o divisione Corporate Finance di una big four che ha
+        assistito l'acquirente nella valutazione e strutturazione del deal.
+      </div>
+      <div class="field-example">
+        <strong>Esempi:</strong> Mediobanca &nbsp;|&nbsp; KPMG Corporate Finance &nbsp;|&nbsp; Rothschild &nbsp;|&nbsp; Lazard &nbsp;|&nbsp; PwC Deals &nbsp;|&nbsp; Deloitte Financial Advisory
+      </div>
+    </div>
+  </div>
+
+  <!-- ── STEP D ─────────────────────────────────────────────────────────────── -->
+  <div class="section" id="step-d">
+    <div class="section-header">
+      <h2>🏭 D — Impresa target (anagrafica)</h2>
+      <p>Identità, localizzazione e settore dell'impresa acquisita.</p>
+    </div>
+
+    <div class="field">
+      <div class="field-name">Ragione sociale target <span class="badge-req">OBBLIGATORIO</span></div>
+      <div class="field-desc">
+        Il nome ufficiale dell'impresa acquisita al momento del deal, come risulta dal Registro Imprese.
+        Includere la forma giuridica (SpA, Srl, SrL unipersonale, ecc.). Se l'impresa ha cambiato nome
+        dopo l'acquisizione, usare il nome precedente al deal.
+      </div>
+      <div class="field-example">
+        <strong>Esempi:</strong> Plastipak Abruzzo Srl &nbsp;|&nbsp; Adriatica Real Estate SpA &nbsp;|&nbsp; Farmaceutica Marsica SpA
+      </div>
+    </div>
+
+    <div class="field">
+      <div class="field-name">P.IVA / Codice fiscale <span class="badge-opt">FACOLTATIVO</span></div>
+      <div class="field-desc">
+        L'identificativo fiscale dell'impresa target (11 cifre per P.IVA, 16 caratteri per CF persona fisica).
+        Consente la ricerca automatica e l'arricchimento dei dati dal Registro Imprese.
+        Reperibile su visura camerale, fatture, sito aziendale o database pubblici.
+      </div>
+      <div class="field-example">
+        <strong>Esempio:</strong> 01234567890
+      </div>
+    </div>
+
+    <div class="field">
+      <div class="field-name">Settore PEM® <span class="badge-req">OBBLIGATORIO</span></div>
+      <div class="field-desc">
+        La classificazione settoriale dello schema PEM® LIUC, derivata dai codici SIC internazionali.
+        Scegliere il settore che meglio descrive l'attività <em>prevalente</em> del target:
+      </div>
+      <ul class="field-options">
+        <li><strong>Industrial products</strong> — meccanica strumentale, componentistica industriale, materiali, impiantistica, automazione, packaging.</li>
+        <li><strong>Consumer goods</strong> — beni di consumo, abbigliamento, calzature, arredo, retail, e-commerce.</li>
+        <li><strong>Food &amp; beverage</strong> — agroalimentare, bevande, prodotti ittici, ristorazione, distribuzione alimentare.</li>
+        <li><strong>ICT / Software</strong> — software applicativo e gestionale, servizi IT, cybersecurity, telecomunicazioni, digital media.</li>
+        <li><strong>Healthcare / Pharma</strong> — farmaceutica, biotecnologie, dispositivi medici, cliniche private, diagnostica, servizi sanitari.</li>
+        <li><strong>Financial services</strong> — banche, assicurazioni, leasing, factoring, gestione patrimoniale, fintech.</li>
+        <li><strong>Cleantech</strong> — energie rinnovabili (fotovoltaico, eolico, idro), efficienza energetica, gestione rifiuti, economia circolare.</li>
+        <li><strong>Leisure</strong> — turismo, hospitality (hotel, resort), intrattenimento, sport, benessere.</li>
+        <li><strong>Professional &amp; social services</strong> — studi professionali, formazione, welfare, servizi alla persona, comunicazione.</li>
+        <li><strong>Altro</strong> — settori non classificabili nelle categorie precedenti (specificare nelle note).</li>
+      </ul>
+    </div>
+
+    <div class="field">
+      <div class="field-name">Provincia <span class="badge-req">OBBLIGATORIO</span></div>
+      <div class="field-desc">
+        La provincia abruzzese in cui ha sede legale il target. Se il target ha più sedi,
+        indicare la sede legale (non operativa). Le quattro province sono:
+        Chieti (CH), Pescara (PE), Teramo (TE), L'Aquila (AQ).
+      </div>
+    </div>
+
+    <div class="field">
+      <div class="field-name">Comune <span class="badge-opt">FACOLTATIVO</span></div>
+      <div class="field-desc">
+        Il comune di sede legale del target. Aiuta a georeferenziare le operazioni a livello sub-provinciale.
+      </div>
+      <div class="field-example">
+        <strong>Esempi:</strong> Lanciano &nbsp;|&nbsp; Vasto &nbsp;|&nbsp; Pescara &nbsp;|&nbsp; Avezzano &nbsp;|&nbsp; Teramo
+      </div>
+    </div>
+
+    <div class="field">
+      <div class="field-name">Codice ATECO <span class="badge-opt">FACOLTATIVO</span></div>
+      <div class="field-desc">
+        Il codice ATECO 2007 dell'attività prevalente del target, reperibile dalla visura camerale
+        (campo "attività prevalente"). Inserire almeno le prime 4 cifre (divisione e gruppo).
+        Consente confronti con le statistiche ISTAT e l'incrocio con i dati Registro Imprese.
+      </div>
+      <div class="field-example">
+        <strong>Esempi:</strong> 29.10 (fabbricazione di autoveicoli) &nbsp;|&nbsp;
+        62.01 (produzione di software) &nbsp;|&nbsp; 10.13 (lavorazione carni)
+      </div>
+    </div>
+
+    <div class="field">
+      <div class="field-name">Fascia dimensionale <span class="badge-req">OBBLIGATORIO</span></div>
+      <div class="field-desc">
+        La dimensione del target classificata in base al fatturato dell'esercizio precedente al deal (t-1),
+        secondo le soglie UE per PMI:
+      </div>
+      <ul class="field-options">
+        <li><strong>&lt; 2M (micro)</strong> — microimpresa (fatturato inferiore a 2 milioni di euro).</li>
+        <li><strong>2–10M (piccola)</strong> — piccola impresa.</li>
+        <li><strong>10–50M (media)</strong> — media impresa (fascia più frequente nell'osservatorio).</li>
+        <li><strong>50–300M (grande)</strong> — grande impresa.</li>
+        <li><strong>&gt; 300M (molto grande)</strong> — corporate di grandi dimensioni.</li>
+      </ul>
+      <div class="field-note">
+        ⚠ Se il fatturato non è noto con precisione, stimare la fascia in base alle informazioni disponibili
+        (es. numero dipendenti, dimensione percepita) e segnalare l'incertezza nelle note.
+      </div>
+    </div>
+
+    <div class="field">
+      <div class="field-name">Descrizione attività <span class="badge-opt">FACOLTATIVO</span></div>
+      <div class="field-desc">
+        2-4 righe descrittive sull'attività principale del target: prodotto o servizio offerto,
+        mercati/clienti serviti, eventuale posizionamento di nicchia o specificità territoriale.
+        Fondamentale per contestualizzare il deal e orientare la classificazione settoriale.
+      </div>
+      <div class="field-example">
+        <strong>Esempio:</strong> "Produzione di componenti in plastica tecnica per il settore automotive.
+        Principale cliente: Stellantis Val di Sangro. Attiva dal 1987, export al 30%."
+      </div>
+    </div>
+  </div>
+
+  <!-- ── STEP E ─────────────────────────────────────────────────────────────── -->
+  <div class="section" id="step-e">
+    <div class="section-header">
+      <h2>📊 E — Dati economico-finanziari</h2>
+      <p>Dati di bilancio del target prima dell'acquisizione. Fonte consigliata: bilancio CCIAA (gratuito su Registro Imprese o Cerved Open Data).</p>
+    </div>
+
+    <div class="field">
+      <div class="field-name">Convenzioni temporali <span class="badge-auto">AUTOMATICO</span></div>
+      <div class="field-desc">
+        I dati si riferiscono agli esercizi fiscali del <em>target</em> antecedenti al deal,
+        usando la notazione:
+      </div>
+      <ul class="field-options">
+        <li><strong>t-1</strong> — esercizio immediatamente precedente al deal. È il dato più importante e deve essere compilato prioritariamente.</li>
+        <li><strong>t-2</strong> — due esercizi prima del deal.</li>
+        <li><strong>t-3</strong> — tre esercizi prima del deal.</li>
+      </ul>
+      <div class="field-example">
+        <strong>Esempio:</strong> deal con data annuncio marzo 2023 → t-1 = bilancio 2022 · t-2 = bilancio 2021 · t-3 = bilancio 2020
+      </div>
+    </div>
+
+    <div class="field">
+      <div class="field-name">Fatturato t-1, t-2, t-3 (€M) <span class="badge-opt">FACOLTATIVO</span></div>
+      <div class="field-desc">
+        I ricavi delle vendite e delle prestazioni degli ultimi tre esercizi disponibili.
+        Esprimere in milioni di euro con un decimale (es. <em>24.5</em> per 24,5 milioni).
+        Fonte: voce A1 del Conto Economico nel bilancio depositato in CCIAA.
+      </div>
+      <div class="field-note">
+        ⚠ Per le società che adottano i principi contabili IAS/IFRS, usare i "Ricavi" del conto economico consolidato.
+      </div>
+    </div>
+
+    <div class="field">
+      <div class="field-name">CAGR fatturato <span class="badge-auto">AUTOMATICO</span></div>
+      <div class="field-desc">
+        Il tasso di crescita annuo composto del fatturato tra t-3 e t-1, calcolato automaticamente
+        dalla formula: <em>((t-1 / t-3)^(1/2) − 1) × 100</em>.
+        Viene visualizzato in tempo reale non appena si compilano i campi t-1 e t-3.
+        Un CAGR positivo indica crescita, negativo indica contrazione.
+      </div>
+    </div>
+
+    <div class="field">
+      <div class="field-name">EBITDA t-1 (€M) <span class="badge-opt">FACOLTATIVO</span></div>
+      <div class="field-desc">
+        L'EBITDA (Earnings Before Interest, Taxes, Depreciation and Amortization) dell'esercizio t-1,
+        cioè il risultato operativo prima degli ammortamenti, degli oneri finanziari e delle imposte.
+        Dal bilancio ordinario italiano si calcola come:
+        <em>Valore della produzione − Costi della produzione + Ammortamenti e svalutazioni</em>.
+        Esprimere in milioni di euro. Lasciare vuoto se non disponibile.
+      </div>
+    </div>
+
+    <div class="field">
+      <div class="field-name">Margine EBITDA <span class="badge-auto">AUTOMATICO</span></div>
+      <div class="field-desc">
+        Calcolato automaticamente come EBITDA / Fatturato t-1.
+        Un margine superiore al 10% è generalmente considerato positivo nelle PMI manifatturiere.
+        Viene visualizzato in tempo reale non appena si compilano EBITDA e Fatturato t-1.
+      </div>
+    </div>
+
+    <div class="field">
+      <div class="field-name">Dipendenti <span class="badge-opt">FACOLTATIVO</span></div>
+      <div class="field-desc">
+        Il numero di dipendenti del target al momento del deal (o all'ultimo esercizio disponibile).
+        Reperibile dalla nota integrativa del bilancio, dalla visura camerale o da articoli di stampa.
+      </div>
+    </div>
+  </div>
+
+  <!-- ── STEP F ─────────────────────────────────────────────────────────────── -->
+  <div class="section" id="step-f">
+    <div class="section-header">
+      <h2>📋 F — Metadati e compilatore</h2>
+      <p>Qualità della fonte e dati di chi compila la scheda.</p>
+    </div>
+
+    <div class="field">
+      <div class="field-name">Affidabilità della fonte <span class="badge-req">OBBLIGATORIO</span></div>
+      <div class="field-desc">
+        Una valutazione complessiva della qualità e verificabilità delle informazioni inserite nella scheda:
+      </div>
+      <ul class="field-options">
+        <li><strong>Alta</strong> — dati verificati su fonti ufficiali: atto al Registro Imprese, comunicato societario ufficiale, database commerciale premium (Mergermarket, Zephyr), bilancio CCIAA. I dati principali (target, acquirente, valore) sono tutti documentati.</li>
+        <li><strong>Media</strong> — dati ricavati da stampa qualificata (Il Sole 24 Ore, MF) con almeno un riscontro indiretto. Alcuni campi (es. valore) potrebbero essere stimati o non confermati.</li>
+        <li><strong>Bassa</strong> — dati da fonte singola non verificata, stima non documentata, notizia non confermata, informazione di seconda mano. Utile per segnalare operazioni di cui si sospetta l'esistenza ma che non sono state ancora verificate.</li>
+      </ul>
+    </div>
+
+    <div class="field">
+      <div class="field-name">URL / riferimento fonte <span class="badge-opt">FACOLTATIVO</span></div>
+      <div class="field-desc">
+        Il link diretto all'articolo, al comunicato stampa, all'atto pubblico o al database che documenta
+        il deal. Per fonti cartacee o archiviate: citazione bibliografica sintetica.
+        Questo campo è fondamentale per permettere al team dell'Osservatorio di verificare e
+        arricchire la scheda.
+      </div>
+      <div class="field-example">
+        <strong>Esempi:</strong>
+        https://www.ilsole24ore.com/art/… &nbsp;|&nbsp;
+        Il Sole 24 Ore, 15/03/2023, p. 24 &nbsp;|&nbsp;
+        Mergermarket deal ID 12345678
+      </div>
+    </div>
+
+    <div class="field">
+      <div class="field-name">Note aggiuntive <span class="badge-opt">FACOLTATIVO</span></div>
+      <div class="field-desc">
+        Qualsiasi informazione aggiuntiva rilevante che non trova posto negli altri campi:
+        dati stimati (con indicazione della base della stima), ambiguità irrisolte, informazioni
+        da verificare, variazioni note rispetto ai valori inseriti, operazioni collegate.
+        Questo campo è letto dal team dell'Osservatorio prima della validazione.
+      </div>
+    </div>
+
+    <hr>
+
+    <div class="field">
+      <div class="field-name">Nome e cognome compilatore <span class="badge-req">OBBLIGATORIO</span></div>
+      <div class="field-desc">
+        Il nome e cognome del professionista che compila la scheda. Usato esclusivamente per
+        eventuali richieste di chiarimento da parte del team dell'Osservatorio.
+        Non viene mai pubblicato nei report o nelle presentazioni.
+      </div>
+    </div>
+
+    <div class="field">
+      <div class="field-name">Email compilatore <span class="badge-req">OBBLIGATORIO</span></div>
+      <div class="field-desc">
+        L'indirizzo email a cui il team dell'Osservatorio può contattare il compilatore
+        per chiarimenti o integrazioni. Non viene mai pubblicato.
+      </div>
+    </div>
+
+    <div class="field">
+      <div class="field-name">Studio / organizzazione <span class="badge-opt">FACOLTATIVO</span></div>
+      <div class="field-desc">
+        Il nome dello studio professionale, della società o dell'istituzione di appartenenza del compilatore.
+        Aiuta a contestualizzare la segnalazione e a capire la prospettiva con cui è stato osservato il deal.
+      </div>
+      <div class="field-example">
+        <strong>Esempi:</strong> Studio Legale Rossi &amp; Associati &nbsp;|&nbsp;
+        KPMG Advisory SpA &nbsp;|&nbsp; Banca Popolare dell'Adriatico &nbsp;|&nbsp;
+        Università degli Studi d'Abruzzo
+      </div>
+    </div>
+
+  </div>
+
+  <div style="text-align:center; margin-top:48px;">
+    <a href="index.html"
+      style="display:inline-block; background:#1B4F8A; color:#fff; border-radius:8px;
+        padding:12px 28px; font-size:14px; font-weight:700; text-decoration:none;">
+      ← Torna al form di segnalazione
+    </a>
+  </div>
+
+</div>
+</body>
+</html>
