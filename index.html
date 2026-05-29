@@ -231,6 +231,9 @@
       "compilatore_nome","compilatore_email","compilatore_studio",
     ];
 
+    // URL del Google Apps Script Web App — incollare dopo il deploy, poi aggiornare su GitHub
+    const APPS_SCRIPT_URL = "";
+
     function toCSV(records) {
       if (!records.length) return "";
       const escape = v => `"${String(v ?? "").replace(/"/g, '""')}"`;
@@ -252,6 +255,7 @@
       const [records, setRecords] = useState([]);
       const [showRecords, setShowRecords] = useState(false);
       const [saveMsg, setSaveMsg] = useState("");
+      const [sendStatus, setSendStatus] = useState(null); // null | "sending" | "ok" | "error"
 
       useEffect(() => {
         try {
@@ -338,6 +342,17 @@
         } catch {}
         setRecords(newRecords);
         setSubmitted(true);
+        if (APPS_SCRIPT_URL) {
+          setSendStatus("sending");
+          fetch(APPS_SCRIPT_URL, {
+            method: "POST",
+            headers: { "Content-Type": "text/plain;charset=utf-8" },
+            body: JSON.stringify(record),
+          })
+            .then(r => r.json())
+            .then(j => setSendStatus(j.status === "ok" || j.status === "duplicate" ? "ok" : "error"))
+            .catch(() => setSendStatus("error"));
+        }
       };
 
       const downloadSingle = () => {
@@ -352,7 +367,7 @@
         a.click(); URL.revokeObjectURL(url);
       };
 
-      const reset = () => { setData(INITIAL); setStep(0); setSubmitted(false); setErrors({}); };
+      const reset = () => { setData(INITIAL); setStep(0); setSubmitted(false); setErrors({}); setSendStatus(null); };
 
       const downloadCSV = () => {
         const csv = toCSV(records);
@@ -401,7 +416,7 @@
             ) : submitted ? (
               <SuccessView record={records[records.length-1]} onNew={reset}
                 onShowArchive={() => setShowRecords(true)} total={records.length}
-                onDownloadSingle={downloadSingle} />
+                onDownloadSingle={downloadSingle} sendStatus={sendStatus} />
             ) : (
               <>
                 <Stepper steps={STEPS} current={step} />
@@ -807,7 +822,7 @@
     }
 
     // ── Schermata successo ────────────────────────────────────────────────────
-    function SuccessView({ record, onNew, onShowArchive, total, onDownloadSingle }) {
+    function SuccessView({ record, onNew, onShowArchive, total, onDownloadSingle, sendStatus }) {
       return (
         <div style={{ padding:"32px 20px" }}>
           <div style={{ textAlign:"center", marginBottom:28 }}>
@@ -816,6 +831,27 @@
             <p style={{ color:MUTED, fontSize:13, margin:0 }}>ID: <span style={{ fontFamily:"monospace",
               fontWeight:700, color:NAVY }}>{record?.deal_id}</span></p>
           </div>
+
+          {sendStatus && (
+            <div style={{
+              maxWidth:560, margin:"0 auto 20px", padding:"10px 16px", borderRadius:8,
+              display:"flex", alignItems:"center", gap:10,
+              background: sendStatus==="ok" ? "#E8F8F0" : sendStatus==="error" ? "#FEF0EE" : "#EBF5FB",
+              border:`1px solid ${sendStatus==="ok" ? "#A9DFC1" : sendStatus==="error" ? "#F5C6C2" : "#AED6F1"}`,
+            }}>
+              <span style={{ fontSize:18 }}>
+                {sendStatus==="sending" ? "⏳" : sendStatus==="ok" ? "✅" : "⚠️"}
+              </span>
+              <p style={{ margin:0, fontSize:13,
+                color: sendStatus==="ok" ? SUCCESS : sendStatus==="error" ? DANGER : BLUE }}>
+                {sendStatus==="sending"
+                  ? "Invio all'Osservatorio in corso…"
+                  : sendStatus==="ok"
+                  ? "Segnalazione ricevuta dall'Osservatorio — nessuna altra azione richiesta."
+                  : "Errore di rete: l'Osservatorio non ha ricevuto i dati. Scarica il CSV e invialo via email."}
+              </p>
+            </div>
+          )}
 
           <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:10,
             marginBottom:24, maxWidth:480, margin:"0 auto 24px" }}>
