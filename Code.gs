@@ -67,8 +67,23 @@ function getSheet_() {
   return sheet;
 }
 
-function doGet() {
+function csvEscape_(value) {
+  const text = value === null || value === undefined ? "" : String(value);
+  return '"' + text.replace(/"/g, '""') + '"';
+}
+
+function doGet(e) {
   const ss = getSpreadsheet_();
+  const params = (e && e.parameter) ? e.parameter : {};
+  if (params.format === "csv" || params.export === "csv") {
+    const sheet = getSheet_();
+    const values = sheet.getDataRange().getValues();
+    const csv = values.map(row => row.map(csvEscape_).join(",")).join("\n");
+    return ContentService
+      .createTextOutput(csv)
+      .setMimeType(ContentService.MimeType.CSV);
+  }
+
   return ContentService
     .createTextOutput(JSON.stringify({
       status: "ok",
