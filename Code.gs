@@ -1,7 +1,9 @@
-// ── Osservatorio M&A Abruzzo — Google Apps Script backend ────────────────────
-// Incollare in: Google Sheet › Estensioni › Apps Script
-// Deploy: Web App, esegui come "Me", accesso "Anyone"
-// Copiare l'URL del deployment nel campo APPS_SCRIPT_URL di index.html
+// Osservatorio M&A Abruzzo - Google Apps Script backend standalone
+// Deploy: Web App, esegui come "Me", accesso "Anyone".
+
+const SHEET_NAME = "Segnalazioni";
+const SPREADSHEET_NAME = "Osservatorio M&A Abruzzo - Segnalazioni";
+const SPREADSHEET_ID_PROPERTY = "OSSERVATORIO_MA_SPREADSHEET_ID";
 
 const COLS = [
   "deal_id","form_version","data_annuncio","data_closing",
@@ -39,26 +41,48 @@ const COLS = [
   "note","compilatore_nome","compilatore_email","compilatore_studio",
 ];
 
+function getSpreadsheet_() {
+  const props = PropertiesService.getScriptProperties();
+  let id = props.getProperty(SPREADSHEET_ID_PROPERTY);
+  if (!id) {
+    const ss = SpreadsheetApp.create(SPREADSHEET_NAME);
+    id = ss.getId();
+    props.setProperty(SPREADSHEET_ID_PROPERTY, id);
+  }
+  return SpreadsheetApp.openById(id);
+}
+
+function getSheet_() {
+  const ss = getSpreadsheet_();
+  let sheet = ss.getSheetByName(SHEET_NAME);
+  if (!sheet) sheet = ss.insertSheet(SHEET_NAME);
+  if (sheet.getLastRow() === 0) {
+    sheet.appendRow(COLS);
+    const hdr = sheet.getRange(1, 1, 1, COLS.length);
+    hdr.setFontWeight("bold");
+    hdr.setBackground("#1B4F8A");
+    hdr.setFontColor("#FFFFFF");
+    sheet.setFrozenRows(1);
+  }
+  return sheet;
+}
+
 function doGet() {
-  return ContentService.createTextOutput("Osservatorio M&A — endpoint attivo");
+  const ss = getSpreadsheet_();
+  return ContentService
+    .createTextOutput(JSON.stringify({
+      status: "ok",
+      message: "Osservatorio M&A endpoint attivo",
+      spreadsheet_url: ss.getUrl(),
+    }))
+    .setMimeType(ContentService.MimeType.JSON);
 }
 
 function doPost(e) {
   try {
-    const sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
+    const sheet = getSheet_();
     const data = JSON.parse(e.postData.contents);
 
-    // Intestazioni se il foglio è vuoto
-    if (sheet.getLastRow() === 0) {
-      sheet.appendRow(COLS);
-      const hdr = sheet.getRange(1, 1, 1, COLS.length);
-      hdr.setFontWeight("bold");
-      hdr.setBackground("#1B4F8A");
-      hdr.setFontColor("#FFFFFF");
-      sheet.setFrozenRows(1);
-    }
-
-    // Controlla duplicati su deal_id
     const existing = sheet.getRange(1, 1, Math.max(sheet.getLastRow(), 1), 1).getValues().flat();
     if (existing.includes(data.deal_id)) {
       return ContentService
@@ -67,14 +91,11 @@ function doPost(e) {
     }
 
     sheet.appendRow(COLS.map(col => data[col] ?? ""));
-
-    // Auto-resize colonne principali
     sheet.autoResizeColumns(1, COLS.length);
 
     return ContentService
       .createTextOutput(JSON.stringify({ status: "ok", deal_id: data.deal_id }))
       .setMimeType(ContentService.MimeType.JSON);
-
   } catch (err) {
     return ContentService
       .createTextOutput(JSON.stringify({ status: "error", message: err.toString() }))
