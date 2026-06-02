@@ -32,6 +32,10 @@
     const DANGER  = "#C0392B";
     const MUTED   = "#6B7C93";
     const BG      = "#F5F8FC";
+    const PARAMS = new URLSearchParams(window.location.search);
+    const DEFAULT_ADVANCED = ["1","true","si","sì","avanzata","advanced"].includes(
+      (PARAMS.get("advanced") || PARAMS.get("avanzato") || PARAMS.get("versione") || "").toLowerCase()
+    );
 
     // ── Dati di lookup ────────────────────────────────────────────────────────
     const LISTS = {
@@ -44,30 +48,76 @@
       settore_pem:          ["Industrial products","Consumer goods","Food & beverage","ICT / Software","Healthcare / Pharma","Financial services","Cleantech","Leisure","Professional & social services","Altro"],
       target_dimensione:    ["< 2M (micro)","2–10M (piccola)","10–50M (media)","50–300M (grande)","> 300M (molto grande)"],
       affidabilita:         ["Alta","Media","Bassa"],
+      yesno:                ["No","Sì"],
+      razionale:            ["Espansione geografica","Integrazione verticale","Consolidamento orizzontale","Acquisizione tecnologia / know-how","Passaggio generazionale","Distress / rescue","Diversificazione","Altro"],
+      geografia_deal:       ["Intra-Abruzzo","Abruzzo-resto Italia","Resto Italia-Abruzzo","Abruzzo-estero","Estero-Abruzzo"],
+      prossimita_territoriale:["Locale","Nazionale","Cross-border"],
+      valore_fascia:        ["<5 mln","5-20 mln","20-100 mln",">100 mln","n.d."],
+      fatturato_fascia:     ["<2 mln","2-10 mln","10-50 mln","50-300 mln",">300 mln","n.d."],
+      successo_deal:        ["Alto successo","Successo moderato","Neutro","Critico","Non valutabile"],
+      integrazione_stato:   ["Non avviata","Parziale","Completata","n.d."],
     };
 
     const INITIAL = {
+      form_version:"normale",
       data_annuncio:"", data_closing:"", fonte_primaria:"",
       tipologia_operazione:"", deal_origination:"", quota_acquisita_pct:"",
       equity_investito_mln:"", enterprise_value_mln:"", ev_ebitda_x:"", ev_sales_x:"",
+      equity_investito_fascia:"", enterprise_value_fascia:"", equity_value_mln:"", prezzo_pagato_mln:"",
+      ev_ebit_x:"", pe_x:"", pbv_x:"", premio_predeal_pct:"",
       modalita_pagamento:"", addon_flag:"No", platform_company:"", cross_border_flag:"No",
+      razionale_principale:"", razionale_secondario:"",
+      integrazione_verticale_flag:"No", consolidamento_orizzontale_flag:"No",
+      espansione_geografica_flag:"No", acquisizione_tecnologia_flag:"No",
+      passaggio_generazionale_flag:"No", distress_rescue_flag:"No", diversificazione_flag:"No",
+      geografia_deal:"", target_sede_operativa_abruzzo_flag:"No",
+      acquirente_sede_operativa_abruzzo_flag:"No", prossimita_territoriale:"",
       acquirente_nome:"", acquirente_tipo:"", acquirente_paese:"IT", coinvestitori:"",
       advisor_legale_acquirente:"", advisor_fin_acquirente:"",
+      buyer_settore:"", buyer_quotato_flag:"No", buyer_ricavi_mln:"", buyer_ebitda_mln:"",
+      buyer_ebit_mln:"", buyer_utile_netto_mln:"", buyer_pfn_mln:"", buyer_debt_ebitda_x:"",
+      buyer_roa_pct:"", buyer_roe_pct:"", buyer_ros_pct:"", buyer_export_pct:"", buyer_brevetti_flag:"No",
       target_nome:"", target_cf_piva:"", target_provincia:"", target_comune:"",
       settore_pem:"", codice_ateco:"", attivita_descrizione:"", target_dimensione:"",
+      fatturato_fascia:"",
       fatturato_t0_mln:"", fatturato_t1_mln:"", fatturato_t2_mln:"",
-      ebitda_mln:"", dipendenti:"",
+      ebitda_mln:"", ebit_mln:"", utile_netto_mln:"", pfn_mln:"", debt_ebitda_x:"",
+      roa_pct:"", roe_pct:"", ros_pct:"", export_pct:"", brevetti_flag:"No", dipendenti:"",
+      sinergie_costo_attese_mln:"", sinergie_ricavo_attese_mln:"",
+      sinergie_fiscali_flag:"No", sinergie_finanziarie_flag:"No",
+      timing_sinergie_mesi:"", costi_integrazione_attesi_mln:"",
+      rischi_due_diligence:"", rischio_antitrust_flag:"No",
+      management_target_permane_flag:"", fondatore_permane_flag:"", investitore_finanziario_flag:"",
+      ricavi_post_12_mln:"", ricavi_post_24_mln:"", ricavi_post_36_mln:"",
+      ebitda_post_12_mln:"", ebitda_post_24_mln:"", ebitda_post_36_mln:"",
+      ebit_post_12_mln:"", ebit_post_24_mln:"", ebit_post_36_mln:"",
+      utile_post_12_mln:"", utile_post_24_mln:"", utile_post_36_mln:"",
+      pfn_post_12_mln:"", pfn_post_24_mln:"", pfn_post_36_mln:"",
+      dipendenti_post_12:"", dipendenti_post_24:"", dipendenti_post_36:"",
+      sinergie_realizzate_pct:"", tempi_sinergie_effettivi_mesi:"",
+      costi_integrazione_effettivi_mln:"", integrazione_it_stato:"",
+      brand_integrato_flag:"", rete_commerciale_integrata_flag:"",
+      ristrutturazioni_chiusure_flag:"", impairment_goodwill_flag:"",
+      write_off_flag:"", dismissione_successiva_flag:"", acquisizioni_correttive_flag:"",
+      giudizio_successo_deal:"", success_score:"",
       affidabilita:"", url_fonte:"", note:"",
       compilatore_nome:"", compilatore_email:"", compilatore_studio:"",
     };
 
-    const STEPS = [
+    const BASE_STEPS = [
       { id:"A", label:"Identificazione", icon:"🗓" },
       { id:"B", label:"Deal",            icon:"🤝" },
       { id:"C", label:"Acquirente",      icon:"🏢" },
       { id:"D", label:"Target",          icon:"🏭" },
       { id:"E", label:"Finanziari",       icon:"📊" },
       { id:"F", label:"Metadati",        icon:"📋" },
+    ];
+    const ADVANCED_STEPS = [
+      ...BASE_STEPS.slice(0, 5),
+      { id:"G", label:"Fin. avanzati", icon:"€" },
+      { id:"H", label:"Sinergie", icon:"⇄" },
+      { id:"I", label:"Follow-up", icon:"12" },
+      BASE_STEPS[5],
     ];
 
     // ── Componenti UI base ────────────────────────────────────────────────────
@@ -148,8 +198,9 @@
     }
 
     function Grid({ cols=2, children }) {
+      const min = cols >= 4 ? 130 : cols === 3 ? 150 : 220;
       return (
-        <div style={{ display:"grid", gridTemplateColumns:`repeat(${cols}, 1fr)`, gap:"0 20px" }}>
+        <div style={{ display:"grid", gridTemplateColumns:`repeat(auto-fit, minmax(${min}px, 1fr))`, gap:"0 20px" }}>
           {children}
         </div>
       );
@@ -186,28 +237,28 @@
     }
 
     // ── Validazione per step ──────────────────────────────────────────────────
-    function validateStep(step, data) {
+    function validateStep(stepId, data) {
       const errs = {};
-      if (step === 0) {
+      if (stepId === "A") {
         if (!data.data_annuncio) errs.data_annuncio = "Data obbligatoria";
         if (!data.fonte_primaria) errs.fonte_primaria = "Fonte obbligatoria";
       }
-      if (step === 1) {
+      if (stepId === "B") {
         if (!data.tipologia_operazione) errs.tipologia_operazione = "Campo obbligatorio";
         if (!data.deal_origination) errs.deal_origination = "Campo obbligatorio";
       }
-      if (step === 2) {
+      if (stepId === "C") {
         if (!data.acquirente_nome) errs.acquirente_nome = "Campo obbligatorio";
         if (!data.acquirente_tipo) errs.acquirente_tipo = "Campo obbligatorio";
         if (!data.acquirente_paese) errs.acquirente_paese = "Campo obbligatorio";
       }
-      if (step === 3) {
+      if (stepId === "D") {
         if (!data.target_nome) errs.target_nome = "Campo obbligatorio";
         if (!data.target_provincia) errs.target_provincia = "Campo obbligatorio";
         if (!data.settore_pem) errs.settore_pem = "Campo obbligatorio";
         if (!data.target_dimensione) errs.target_dimensione = "Campo obbligatorio";
       }
-      if (step === 5) {
+      if (stepId === "F") {
         if (!data.affidabilita) errs.affidabilita = "Campo obbligatorio";
         if (!data.compilatore_nome) errs.compilatore_nome = "Campo obbligatorio";
         if (!data.compilatore_email) errs.compilatore_email = "Campo obbligatorio";
@@ -217,16 +268,44 @@
 
     // ── Generazione CSV ───────────────────────────────────────────────────────
     const PIPELINE_COLS = [
-      "deal_id","data_annuncio","data_closing","anno","fonte_primaria",
+      "deal_id","form_version","data_annuncio","data_closing","anno","fonte_primaria",
       "tipologia_operazione","deal_origination","quota_acquisita_pct",
       "equity_investito_mln","enterprise_value_mln","ev_ebitda_x","ev_sales_x",
+      "equity_investito_fascia","enterprise_value_fascia","equity_value_mln","prezzo_pagato_mln",
+      "ev_ebit_x","pe_x","pbv_x","premio_predeal_pct",
       "modalita_pagamento","addon_flag","platform_company","cross_border_flag",
+      "razionale_principale","razionale_secondario",
+      "integrazione_verticale_flag","consolidamento_orizzontale_flag",
+      "espansione_geografica_flag","acquisizione_tecnologia_flag",
+      "passaggio_generazionale_flag","distress_rescue_flag","diversificazione_flag",
+      "geografia_deal","target_sede_operativa_abruzzo_flag",
+      "acquirente_sede_operativa_abruzzo_flag","prossimita_territoriale",
       "acquirente_nome","acquirente_tipo","acquirente_paese","acquirente_estero",
       "coinvestitori","advisor_legale_acquirente","advisor_fin_acquirente",
+      "buyer_settore","buyer_quotato_flag","buyer_ricavi_mln","buyer_ebitda_mln",
+      "buyer_ebit_mln","buyer_utile_netto_mln","buyer_pfn_mln","buyer_debt_ebitda_x",
+      "buyer_roa_pct","buyer_roe_pct","buyer_ros_pct","buyer_export_pct","buyer_brevetti_flag",
       "target_nome","target_cf_piva","target_provincia","target_comune",
       "settore_pem","codice_ateco","attivita_descrizione","target_dimensione",
-      "fatturato_t0_mln","fatturato_t1_mln","fatturato_t2_mln",
-      "fatturato_cagr_pct","ebitda_mln","ebitda_margin_pct","dipendenti",
+      "fatturato_fascia","fatturato_t0_mln","fatturato_t1_mln","fatturato_t2_mln",
+      "fatturato_cagr_pct","ebitda_mln","ebitda_margin_pct","ebit_mln","utile_netto_mln",
+      "pfn_mln","debt_ebitda_x","roa_pct","roe_pct","ros_pct","export_pct","brevetti_flag","dipendenti",
+      "sinergie_costo_attese_mln","sinergie_ricavo_attese_mln",
+      "sinergie_fiscali_flag","sinergie_finanziarie_flag","timing_sinergie_mesi",
+      "costi_integrazione_attesi_mln","rischi_due_diligence","rischio_antitrust_flag",
+      "management_target_permane_flag","fondatore_permane_flag","investitore_finanziario_flag",
+      "ricavi_post_12_mln","ricavi_post_24_mln","ricavi_post_36_mln",
+      "ebitda_post_12_mln","ebitda_post_24_mln","ebitda_post_36_mln",
+      "ebit_post_12_mln","ebit_post_24_mln","ebit_post_36_mln",
+      "utile_post_12_mln","utile_post_24_mln","utile_post_36_mln",
+      "pfn_post_12_mln","pfn_post_24_mln","pfn_post_36_mln",
+      "dipendenti_post_12","dipendenti_post_24","dipendenti_post_36",
+      "sinergie_realizzate_pct","tempi_sinergie_effettivi_mesi",
+      "costi_integrazione_effettivi_mln","integrazione_it_stato",
+      "brand_integrato_flag","rete_commerciale_integrata_flag",
+      "ristrutturazioni_chiusure_flag","impairment_goodwill_flag","write_off_flag",
+      "dismissione_successiva_flag","acquisizioni_correttive_flag",
+      "giudizio_successo_deal","success_score",
       "affidabilita","url_fonte","data_inserimento","note",
       "compilatore_nome","compilatore_email","compilatore_studio",
     ];
@@ -256,6 +335,9 @@
       const [showRecords, setShowRecords] = useState(false);
       const [saveMsg, setSaveMsg] = useState("");
       const [sendStatus, setSendStatus] = useState(null); // null | "sending" | "ok" | "error"
+      const isAdvanced = DEFAULT_ADVANCED;
+      const steps = isAdvanced ? ADVANCED_STEPS : BASE_STEPS;
+      const currentStep = steps[step]?.id || "A";
 
       useEffect(() => {
         try {
@@ -270,7 +352,7 @@
       }, []);
 
       const next = () => {
-        const errs = validateStep(step, data);
+        const errs = validateStep(currentStep, data);
         if (Object.keys(errs).length) { setErrors(errs); return; }
         setErrors({});
         setStep(s => s + 1);
@@ -280,7 +362,7 @@
       const prev = () => { setStep(s => s - 1); window.scrollTo(0, 0); };
 
       const submit = () => {
-        const errs = validateStep(5, data);
+        const errs = validateStep("F", data);
         if (Object.keys(errs).length) { setErrors(errs); return; }
         const now = new Date().toISOString().slice(0,10);
         const idx = records.length + 1;
@@ -288,7 +370,9 @@
         const cagr = calcCAGR(data.fatturato_t0_mln, data.fatturato_t2_mln);
         const margin = calcMargin(data.ebitda_mln, data.fatturato_t0_mln);
         const record = {
+          ...data,
           deal_id: anno ? `ABR-${anno}-${String(idx).padStart(3,"0")}` : `ABR-???-${String(idx).padStart(3,"0")}`,
+          form_version: isAdvanced ? "avanzata" : "normale",
           data_annuncio: data.data_annuncio,
           data_closing: data.data_closing,
           anno,
@@ -367,7 +451,7 @@
         a.click(); URL.revokeObjectURL(url);
       };
 
-      const reset = () => { setData(INITIAL); setStep(0); setSubmitted(false); setErrors({}); setSendStatus(null); };
+      const reset = () => { setData({ ...INITIAL, form_version: isAdvanced ? "avanzata" : "normale" }); setStep(0); setSubmitted(false); setErrors({}); setSendStatus(null); };
 
       const downloadCSV = () => {
         const csv = toCSV(records);
@@ -397,8 +481,17 @@
               <p style={{ margin:"2px 0 0", fontSize:18, color:"#fff", fontWeight:700 }}>
                 Segnalazione operazione M&amp;A — Abruzzo
               </p>
+              <p style={{ margin:"4px 0 0", fontSize:11, color:"#CFE4F6" }}>
+                Versione {isAdvanced ? "avanzata: include financials, sinergie e follow-up" : "normale: raccolta essenziale"}
+              </p>
             </div>
             <div style={{ display:"flex", gap:10, alignItems:"center" }}>
+              <a href={isAdvanced ? "index.html" : "index.html?versione=avanzata"}
+                style={{ background:isAdvanced ? "#fff" : "rgba(255,255,255,0.12)", border:"1px solid rgba(255,255,255,0.35)",
+                  color:isAdvanced ? NAVY : "#fff", borderRadius:6, padding:"7px 14px", cursor:"pointer", fontSize:12,
+                  textDecoration:"none", fontWeight:600 }}>
+                {isAdvanced ? "Usa versione normale" : "Usa versione avanzata"}
+              </a>
               <a href="help.html" target="_blank"
                 style={{ background:"rgba(255,255,255,0.12)", border:"1px solid rgba(255,255,255,0.3)",
                   color:"#fff", borderRadius:6, padding:"7px 14px", cursor:"pointer", fontSize:12,
@@ -425,16 +518,19 @@
                 onDownloadSingle={downloadSingle} sendStatus={sendStatus} />
             ) : (
               <>
-                <Stepper steps={STEPS} current={step} />
+                <Stepper steps={steps} current={step} />
 
                 <div style={{ background:"#fff", borderRadius:12, border:`1px solid ${BORDER}`,
                   padding:"28px 32px", marginTop:0 }}>
-                  {step === 0 && <StepA data={data} set={set} errors={errors} />}
-                  {step === 1 && <StepB data={data} set={set} errors={errors} />}
-                  {step === 2 && <StepC data={data} set={set} errors={errors} />}
-                  {step === 3 && <StepD data={data} set={set} errors={errors} />}
-                  {step === 4 && <StepE data={data} set={set} errors={errors} />}
-                  {step === 5 && <StepF data={data} set={set} errors={errors} />}
+                  {currentStep === "A" && <StepA data={data} set={set} errors={errors} />}
+                  {currentStep === "B" && <StepB data={data} set={set} errors={errors} />}
+                  {currentStep === "C" && <StepC data={data} set={set} errors={errors} />}
+                  {currentStep === "D" && <StepD data={data} set={set} errors={errors} />}
+                  {currentStep === "E" && <StepE data={data} set={set} errors={errors} />}
+                  {currentStep === "G" && <StepG data={data} set={set} errors={errors} />}
+                  {currentStep === "H" && <StepH data={data} set={set} errors={errors} />}
+                  {currentStep === "I" && <StepI data={data} set={set} errors={errors} />}
+                  {currentStep === "F" && <StepF data={data} set={set} errors={errors} />}
                 </div>
 
                 <div style={{ display:"flex", justifyContent:"space-between",
@@ -446,9 +542,9 @@
                     ← Indietro
                   </button>
                   <span style={{ fontSize:11, color:MUTED }}>
-                    {step+1} / {STEPS.length}
+                    {step+1} / {steps.length}
                   </span>
-                  {step < STEPS.length - 1 ? (
+                  {step < steps.length - 1 ? (
                     <button type="button" onClick={next}
                       style={{ padding:"10px 28px", borderRadius:8, border:"none",
                         background:NAVY, color:"#fff", fontSize:13, fontWeight:600,
@@ -551,6 +647,51 @@
             </Field>
           </Grid>
           <Grid cols={2}>
+            <Field label="Razionale principale" hint="Motivazione industriale/strategica prevalente">
+              <Select value={data.razionale_principale} onChange={set("razionale_principale")}
+                options={LISTS.razionale} />
+            </Field>
+            <Field label="Razionale secondario" hint="Compilare solo se rilevante">
+              <Select value={data.razionale_secondario} onChange={set("razionale_secondario")}
+                options={LISTS.razionale} />
+            </Field>
+          </Grid>
+          <Grid cols={2}>
+            <Field label="Geografia del deal" hint="Direzione territoriale dell'operazione">
+              <Select value={data.geografia_deal} onChange={set("geografia_deal")}
+                options={LISTS.geografia_deal} />
+            </Field>
+            <Field label="Prossimità territoriale" hint="Variabile sintetica per confronti empirici">
+              <Select value={data.prossimita_territoriale} onChange={set("prossimita_territoriale")}
+                options={LISTS.prossimita_territoriale} />
+            </Field>
+          </Grid>
+          <Grid cols={3}>
+            <Field label="Espansione geografica">
+              <TogglePill value={data.espansione_geografica_flag} onChange={set("espansione_geografica_flag")} />
+            </Field>
+            <Field label="Integrazione verticale">
+              <TogglePill value={data.integrazione_verticale_flag} onChange={set("integrazione_verticale_flag")} />
+            </Field>
+            <Field label="Consolidamento orizzontale">
+              <TogglePill value={data.consolidamento_orizzontale_flag} onChange={set("consolidamento_orizzontale_flag")} />
+            </Field>
+          </Grid>
+          <Grid cols={4}>
+            <Field label="Tecnologia / know-how">
+              <TogglePill value={data.acquisizione_tecnologia_flag} onChange={set("acquisizione_tecnologia_flag")} />
+            </Field>
+            <Field label="Passaggio generazionale">
+              <TogglePill value={data.passaggio_generazionale_flag} onChange={set("passaggio_generazionale_flag")} />
+            </Field>
+            <Field label="Distress / rescue">
+              <TogglePill value={data.distress_rescue_flag} onChange={set("distress_rescue_flag")} />
+            </Field>
+            <Field label="Diversificazione">
+              <TogglePill value={data.diversificazione_flag} onChange={set("diversificazione_flag")} />
+            </Field>
+          </Grid>
+          <Grid cols={2}>
             <Field label="Quota acquisita (%)" hint="Es. 60 per 60%. Se solo range: 51, 75, 90, 100">
               <Input type="number" value={data.quota_acquisita_pct} onChange={set("quota_acquisita_pct")}
                 placeholder="es. 60" min="0" max="100" />
@@ -565,9 +706,19 @@
               <Input type="number" value={data.equity_investito_mln} onChange={set("equity_investito_mln")}
                 placeholder="es. 12.5" min="0" step="0.1" />
             </Field>
+            <Field label="Fascia equity investito" hint="Usare se il valore puntuale non è comunicabile">
+              <Select value={data.equity_investito_fascia} onChange={set("equity_investito_fascia")}
+                options={LISTS.valore_fascia} />
+            </Field>
+          </Grid>
+          <Grid cols={2}>
             <Field label="Enterprise Value (€M)" hint="Valore 100% azienda al momento dell'acq.">
               <Input type="number" value={data.enterprise_value_mln} onChange={set("enterprise_value_mln")}
                 placeholder="es. 45.0" min="0" step="0.1" />
+            </Field>
+            <Field label="Fascia Enterprise Value" hint="Alternativa al valore puntuale">
+              <Select value={data.enterprise_value_fascia} onChange={set("enterprise_value_fascia")}
+                options={LISTS.valore_fascia} />
             </Field>
           </Grid>
           <Grid cols={2}>
@@ -627,6 +778,10 @@
               🌐 Acquirente estero rilevato — verrà classificato automaticamente come cross-border
             </div>
           )}
+          <Field label="Sede operativa acquirente in Abruzzo?" hint="Utile per distinguere investitori realmente radicati sul territorio">
+            <TogglePill value={data.acquirente_sede_operativa_abruzzo_flag}
+              onChange={set("acquirente_sede_operativa_abruzzo_flag")} />
+          </Field>
           <Field label="Co-investitori" hint="Separare con punto e virgola se più di uno">
             <Input value={data.coinvestitori} onChange={set("coinvestitori")}
               placeholder="es. Fondo Italiano d'Investimento SGR; XYZ Capital" />
@@ -685,6 +840,16 @@
               hint="Basata su fatturato t-1">
               <Select value={data.target_dimensione} onChange={set("target_dimensione")}
                 options={LISTS.target_dimensione} />
+            </Field>
+          </Grid>
+          <Grid cols={2}>
+            <Field label="Sede operativa target in Abruzzo?" hint="Se diversa dalla sola sede legale">
+              <TogglePill value={data.target_sede_operativa_abruzzo_flag}
+                onChange={set("target_sede_operativa_abruzzo_flag")} />
+            </Field>
+            <Field label="Fascia fatturato" hint="Alternativa al valore puntuale">
+              <Select value={data.fatturato_fascia} onChange={set("fatturato_fascia")}
+                options={LISTS.fatturato_fascia} />
             </Field>
           </Grid>
           <Field label="Descrizione attività" hint="2-3 righe sull'attività svolta dalla target">
@@ -769,6 +934,151 @@
     }
 
     // ── Step F: Metadati ──────────────────────────────────────────────────────
+    function StepG({ data, set, errors }) {
+      return (
+        <>
+          <SectionTitle>G - Variabili finanziarie avanzate</SectionTitle>
+          <InfoBox>Sezione compilabile su richiesta: buyer, target, multipli, prezzo e leva finanziaria.</InfoBox>
+          <SectionTitle>Valutazione e prezzo</SectionTitle>
+          <Grid cols={3}>
+            <Field label="Equity value (EUR M)"><Input type="number" value={data.equity_value_mln} onChange={set("equity_value_mln")} min="0" step="0.1" /></Field>
+            <Field label="Prezzo pagato (EUR M)"><Input type="number" value={data.prezzo_pagato_mln} onChange={set("prezzo_pagato_mln")} min="0" step="0.1" /></Field>
+            <Field label="Premio pre-deal (%)"><Input type="number" value={data.premio_predeal_pct} onChange={set("premio_predeal_pct")} step="0.1" /></Field>
+          </Grid>
+          <Grid cols={3}>
+            <Field label="EV/EBIT (x)"><Input type="number" value={data.ev_ebit_x} onChange={set("ev_ebit_x")} min="0" step="0.1" /></Field>
+            <Field label="P/E (x)"><Input type="number" value={data.pe_x} onChange={set("pe_x")} min="0" step="0.1" /></Field>
+            <Field label="P/BV (x)"><Input type="number" value={data.pbv_x} onChange={set("pbv_x")} min="0" step="0.1" /></Field>
+          </Grid>
+          <SectionTitle>Profilo buyer pre-deal</SectionTitle>
+          <Grid cols={3}>
+            <Field label="Settore buyer"><Input value={data.buyer_settore} onChange={set("buyer_settore")} /></Field>
+            <Field label="Buyer quotato?"><TogglePill value={data.buyer_quotato_flag} onChange={set("buyer_quotato_flag")} /></Field>
+            <Field label="Brevetti/intangibili buyer?"><TogglePill value={data.buyer_brevetti_flag} onChange={set("buyer_brevetti_flag")} /></Field>
+          </Grid>
+          <Grid cols={4}>
+            <Field label="Ricavi buyer (EUR M)"><Input type="number" value={data.buyer_ricavi_mln} onChange={set("buyer_ricavi_mln")} step="0.1" /></Field>
+            <Field label="EBITDA buyer (EUR M)"><Input type="number" value={data.buyer_ebitda_mln} onChange={set("buyer_ebitda_mln")} step="0.1" /></Field>
+            <Field label="EBIT buyer (EUR M)"><Input type="number" value={data.buyer_ebit_mln} onChange={set("buyer_ebit_mln")} step="0.1" /></Field>
+            <Field label="Utile netto buyer (EUR M)"><Input type="number" value={data.buyer_utile_netto_mln} onChange={set("buyer_utile_netto_mln")} step="0.1" /></Field>
+          </Grid>
+          <Grid cols={4}>
+            <Field label="PFN buyer (EUR M)"><Input type="number" value={data.buyer_pfn_mln} onChange={set("buyer_pfn_mln")} step="0.1" /></Field>
+            <Field label="Debt/EBITDA buyer"><Input type="number" value={data.buyer_debt_ebitda_x} onChange={set("buyer_debt_ebitda_x")} step="0.1" /></Field>
+            <Field label="ROA buyer (%)"><Input type="number" value={data.buyer_roa_pct} onChange={set("buyer_roa_pct")} step="0.1" /></Field>
+            <Field label="ROE buyer (%)"><Input type="number" value={data.buyer_roe_pct} onChange={set("buyer_roe_pct")} step="0.1" /></Field>
+          </Grid>
+          <Grid cols={3}>
+            <Field label="ROS buyer (%)"><Input type="number" value={data.buyer_ros_pct} onChange={set("buyer_ros_pct")} step="0.1" /></Field>
+            <Field label="Export buyer (%)"><Input type="number" value={data.buyer_export_pct} onChange={set("buyer_export_pct")} min="0" max="100" /></Field>
+          </Grid>
+          <SectionTitle>Target pre-deal avanzato</SectionTitle>
+          <Grid cols={4}>
+            <Field label="EBIT target (EUR M)"><Input type="number" value={data.ebit_mln} onChange={set("ebit_mln")} step="0.1" /></Field>
+            <Field label="Utile netto target (EUR M)"><Input type="number" value={data.utile_netto_mln} onChange={set("utile_netto_mln")} step="0.1" /></Field>
+            <Field label="PFN target (EUR M)"><Input type="number" value={data.pfn_mln} onChange={set("pfn_mln")} step="0.1" /></Field>
+            <Field label="Debt/EBITDA target"><Input type="number" value={data.debt_ebitda_x} onChange={set("debt_ebitda_x")} step="0.1" /></Field>
+          </Grid>
+          <Grid cols={4}>
+            <Field label="ROA target (%)"><Input type="number" value={data.roa_pct} onChange={set("roa_pct")} step="0.1" /></Field>
+            <Field label="ROE target (%)"><Input type="number" value={data.roe_pct} onChange={set("roe_pct")} step="0.1" /></Field>
+            <Field label="ROS target (%)"><Input type="number" value={data.ros_pct} onChange={set("ros_pct")} step="0.1" /></Field>
+            <Field label="Export target (%)"><Input type="number" value={data.export_pct} onChange={set("export_pct")} min="0" max="100" /></Field>
+          </Grid>
+          <Field label="Brevetti / intangibili rilevanti target?"><TogglePill value={data.brevetti_flag} onChange={set("brevetti_flag")} /></Field>
+        </>
+      );
+    }
+
+    function StepH({ data, set, errors }) {
+      return (
+        <>
+          <SectionTitle>H - Sinergie, rischi e governance</SectionTitle>
+          <Grid cols={2}>
+            <Field label="Sinergie costo attese (EUR M)"><Input type="number" value={data.sinergie_costo_attese_mln} onChange={set("sinergie_costo_attese_mln")} min="0" step="0.1" /></Field>
+            <Field label="Sinergie ricavo attese (EUR M)"><Input type="number" value={data.sinergie_ricavo_attese_mln} onChange={set("sinergie_ricavo_attese_mln")} min="0" step="0.1" /></Field>
+          </Grid>
+          <Grid cols={2}>
+            <Field label="Timing sinergie atteso (mesi)"><Input type="number" value={data.timing_sinergie_mesi} onChange={set("timing_sinergie_mesi")} min="0" step="1" /></Field>
+            <Field label="Costi integrazione attesi (EUR M)"><Input type="number" value={data.costi_integrazione_attesi_mln} onChange={set("costi_integrazione_attesi_mln")} min="0" step="0.1" /></Field>
+          </Grid>
+          <Grid cols={3}>
+            <Field label="Sinergie fiscali?"><TogglePill value={data.sinergie_fiscali_flag} onChange={set("sinergie_fiscali_flag")} /></Field>
+            <Field label="Sinergie finanziarie?"><TogglePill value={data.sinergie_finanziarie_flag} onChange={set("sinergie_finanziarie_flag")} /></Field>
+            <Field label="Rischio antitrust/regolatorio?"><TogglePill value={data.rischio_antitrust_flag} onChange={set("rischio_antitrust_flag")} /></Field>
+          </Grid>
+          <Field label="Rischi emersi in due diligence"><Textarea value={data.rischi_due_diligence} onChange={set("rischi_due_diligence")} rows={3} /></Field>
+          <SectionTitle>Governance post-deal attesa</SectionTitle>
+          <Grid cols={3}>
+            <Field label="Management target permane?"><Select value={data.management_target_permane_flag} onChange={set("management_target_permane_flag")} options={LISTS.yesno} /></Field>
+            <Field label="Fondatore permane?"><Select value={data.fondatore_permane_flag} onChange={set("fondatore_permane_flag")} options={LISTS.yesno} /></Field>
+            <Field label="Investitore finanziario?"><Select value={data.investitore_finanziario_flag} onChange={set("investitore_finanziario_flag")} options={LISTS.yesno} /></Field>
+          </Grid>
+        </>
+      );
+    }
+
+    function StepI({ data, set, errors }) {
+      return (
+        <>
+          <SectionTitle>I - Follow-up ex post 12 / 24 / 36 mesi</SectionTitle>
+          <InfoBox>Compilare nei follow-up successivi al deal per misurare performance, integrazione e creazione di valore.</InfoBox>
+          <Grid cols={3}>
+            <Field label="Ricavi +12 (EUR M)"><Input type="number" value={data.ricavi_post_12_mln} onChange={set("ricavi_post_12_mln")} step="0.1" /></Field>
+            <Field label="Ricavi +24 (EUR M)"><Input type="number" value={data.ricavi_post_24_mln} onChange={set("ricavi_post_24_mln")} step="0.1" /></Field>
+            <Field label="Ricavi +36 (EUR M)"><Input type="number" value={data.ricavi_post_36_mln} onChange={set("ricavi_post_36_mln")} step="0.1" /></Field>
+          </Grid>
+          <Grid cols={3}>
+            <Field label="EBITDA +12 (EUR M)"><Input type="number" value={data.ebitda_post_12_mln} onChange={set("ebitda_post_12_mln")} step="0.1" /></Field>
+            <Field label="EBITDA +24 (EUR M)"><Input type="number" value={data.ebitda_post_24_mln} onChange={set("ebitda_post_24_mln")} step="0.1" /></Field>
+            <Field label="EBITDA +36 (EUR M)"><Input type="number" value={data.ebitda_post_36_mln} onChange={set("ebitda_post_36_mln")} step="0.1" /></Field>
+          </Grid>
+          <Grid cols={3}>
+            <Field label="EBIT +12 (EUR M)"><Input type="number" value={data.ebit_post_12_mln} onChange={set("ebit_post_12_mln")} step="0.1" /></Field>
+            <Field label="EBIT +24 (EUR M)"><Input type="number" value={data.ebit_post_24_mln} onChange={set("ebit_post_24_mln")} step="0.1" /></Field>
+            <Field label="EBIT +36 (EUR M)"><Input type="number" value={data.ebit_post_36_mln} onChange={set("ebit_post_36_mln")} step="0.1" /></Field>
+          </Grid>
+          <Grid cols={3}>
+            <Field label="Utile +12 (EUR M)"><Input type="number" value={data.utile_post_12_mln} onChange={set("utile_post_12_mln")} step="0.1" /></Field>
+            <Field label="Utile +24 (EUR M)"><Input type="number" value={data.utile_post_24_mln} onChange={set("utile_post_24_mln")} step="0.1" /></Field>
+            <Field label="Utile +36 (EUR M)"><Input type="number" value={data.utile_post_36_mln} onChange={set("utile_post_36_mln")} step="0.1" /></Field>
+          </Grid>
+          <Grid cols={3}>
+            <Field label="PFN +12 (EUR M)"><Input type="number" value={data.pfn_post_12_mln} onChange={set("pfn_post_12_mln")} step="0.1" /></Field>
+            <Field label="PFN +24 (EUR M)"><Input type="number" value={data.pfn_post_24_mln} onChange={set("pfn_post_24_mln")} step="0.1" /></Field>
+            <Field label="PFN +36 (EUR M)"><Input type="number" value={data.pfn_post_36_mln} onChange={set("pfn_post_36_mln")} step="0.1" /></Field>
+          </Grid>
+          <Grid cols={3}>
+            <Field label="Dipendenti +12"><Input type="number" value={data.dipendenti_post_12} onChange={set("dipendenti_post_12")} min="0" step="1" /></Field>
+            <Field label="Dipendenti +24"><Input type="number" value={data.dipendenti_post_24} onChange={set("dipendenti_post_24")} min="0" step="1" /></Field>
+            <Field label="Dipendenti +36"><Input type="number" value={data.dipendenti_post_36} onChange={set("dipendenti_post_36")} min="0" step="1" /></Field>
+          </Grid>
+          <SectionTitle>Integrazione ed esiti</SectionTitle>
+          <Grid cols={3}>
+            <Field label="Sinergie realizzate (%)"><Input type="number" value={data.sinergie_realizzate_pct} onChange={set("sinergie_realizzate_pct")} min="0" max="100" /></Field>
+            <Field label="Tempi effettivi sinergie (mesi)"><Input type="number" value={data.tempi_sinergie_effettivi_mesi} onChange={set("tempi_sinergie_effettivi_mesi")} min="0" step="1" /></Field>
+            <Field label="Costi integrazione effettivi (EUR M)"><Input type="number" value={data.costi_integrazione_effettivi_mln} onChange={set("costi_integrazione_effettivi_mln")} min="0" step="0.1" /></Field>
+          </Grid>
+          <Grid cols={3}>
+            <Field label="Integrazione IT"><Select value={data.integrazione_it_stato} onChange={set("integrazione_it_stato")} options={LISTS.integrazione_stato} /></Field>
+            <Field label="Brand integrato?"><Select value={data.brand_integrato_flag} onChange={set("brand_integrato_flag")} options={LISTS.yesno} /></Field>
+            <Field label="Rete commerciale integrata?"><Select value={data.rete_commerciale_integrata_flag} onChange={set("rete_commerciale_integrata_flag")} options={LISTS.yesno} /></Field>
+          </Grid>
+          <Grid cols={3}>
+            <Field label="Ristrutturazioni/chiusure?"><Select value={data.ristrutturazioni_chiusure_flag} onChange={set("ristrutturazioni_chiusure_flag")} options={LISTS.yesno} /></Field>
+            <Field label="Impairment goodwill?"><Select value={data.impairment_goodwill_flag} onChange={set("impairment_goodwill_flag")} options={LISTS.yesno} /></Field>
+            <Field label="Write-off?"><Select value={data.write_off_flag} onChange={set("write_off_flag")} options={LISTS.yesno} /></Field>
+          </Grid>
+          <Grid cols={3}>
+            <Field label="Dismissione successiva?"><Select value={data.dismissione_successiva_flag} onChange={set("dismissione_successiva_flag")} options={LISTS.yesno} /></Field>
+            <Field label="Acquisizioni correttive?"><Select value={data.acquisizioni_correttive_flag} onChange={set("acquisizioni_correttive_flag")} options={LISTS.yesno} /></Field>
+            <Field label="Giudizio successo deal"><Select value={data.giudizio_successo_deal} onChange={set("giudizio_successo_deal")} options={LISTS.successo_deal} /></Field>
+          </Grid>
+          <Field label="Success score"><Input type="number" value={data.success_score} onChange={set("success_score")} min="0" max="100" step="1" /></Field>
+        </>
+      );
+    }
+
     function StepF({ data, set, errors }) {
       return (
         <>
